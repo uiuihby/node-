@@ -6,24 +6,9 @@ let urlssss=[]
 let topUrl="https://www.wrmyx.com"
 
 
-const  getAllNav=function(url){
-    name = 'Mark';
-    this.topUrl=url
-    httpGet(url,function(html){           // 获取每一个标签页
-      
-        let $ = cheerio.load(html);
-        let nav= $('.nav').find('ul').children();
 
-        nav.each(function(){
-            let nowUrl=$(this).children().attr('href')
-            let href=topUrl+nowUrl
-            getAllpages(href);
-        });
 
-    })
-}
-
-function getAllpages(url){
+ function getAllpages(url){
     
     httpGet(url,function(html){           // 获取每一个标签页
 
@@ -33,7 +18,10 @@ function getAllpages(url){
         pages.each(function(){
             let pageUrl=$(this).children().attr('href')?$(this).children().attr('href'):''
             let allPages=url+pageUrl
-            getPageList(allPages)
+            if(allPages.indexOf("undefined")==-1){       
+                getPageList(allPages)
+            }
+          
         });
 
     })
@@ -41,15 +29,17 @@ function getAllpages(url){
 }
 
 
-function getPageList (url){
+function getPageList (url){              // 获取列表  
 
     httpGet(url,function(html){  
         let $ = cheerio.load(html);
-        let nav= $('.col-md-8').find('.article-list-1').children();
-
+        let nav= $('.result-list').children();
+        console.log(nav)
         nav.each(function(){
-            let href=topUrl+$(this).find(".post-title").children().attr('href')
-            if(href.indexOf("undefined")==-1){           
+        console.log($(this).find('.header').find("a").attr('href'));
+            let href=topUrl+$(this).find('.header').find("a").attr('href')
+            console.log(href);
+            if(href.indexOf("undefined")==-1){       
                 getDetail(href)
             }
  
@@ -57,28 +47,26 @@ function getPageList (url){
         });
     });
 }
-let index=0
+
 function getDetail(url){
-    index+=1
+
     httpGet(url,function(html){  
         let pass=true
         let $ = cheerio.load(html);
-        let detail= $('.view-content').children();
         let index=0
+
+        let detail= $('.company-warp').children();
+
         let data={
             title:null,
-            bodyMsg:null,
+            phone:null,
             link:null,
         }
+        
         detail.each(function(){
-
-            if(index==0){
-                data.title=$(this).find("span").text();
-
-            }else {
-                data.bodyMsg=$(this).find("span").text();
-                data.link=$(this).find("a").attr('href');
-            }
+            console.log(url)
+            data.title=$(this).find(".content").find(".name").text();
+            data.phone=$(this).find(".f0").find(".sup-ie-company-header-child-1").text();
             index+=1
             urlssss.forEach(e => {
                 if(e.title==data.title){
@@ -93,6 +81,9 @@ function getDetail(url){
         });
 
     });
-}
- module.exports = getAllNav
+} 
+ module.exports = {
+    getPageList:getPageList,
+    getAllpages:getAllpages,
+  }
 

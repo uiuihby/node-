@@ -14,6 +14,10 @@ function httpGet(url,callback){
             let html = data.toString();
             callback(html)
         });
+        res.on('error', function () {
+            console.log(e.message)
+        });
+
     })
 }
 
